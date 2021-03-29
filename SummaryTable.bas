@@ -61,13 +61,65 @@ For Each ws In ThisWorkbook.Worksheets
         End If
         If FirstPrice <> 0 Then 'Skip First Price if it equals 0
         ws.Cells(Counter, 11).Value = ((ws.Cells(Row, 6).Value - FirstPrice) / FirstPrice) 'Print Percent Change to table
-        
+            If ((ws.Cells(Row, 6).Value - FirstPrice) / FirstPrice) < 0 Then
+                ws.Cells(Counter, 11).Interior.ColorIndex = 3
+            Else
+                ws.Cells(Counter, 11).Interior.ColorIndex = 4
+            End If
         End If
     Next Row
+   
+   
+    'Declare Variable for callouts
+    Dim Decrease As Double
+    Dim Increase As Double
+    Dim MaxVolume As Double
+    Dim ChangeEval As Long
+    
+    'Draw table
+    
+    Range("N2") = "Greatest % Increase"
+    Range("N3") = "Greatest % Decrease"
+    Range("N4") = "Greatest Total Volume"
+    Range("O1") = "Ticker"
+    Range("P1") = "Value"
+    
+    ' Initialize Callout variables
+    Decrease = 0
+    Increase = 0
+    MaxVolume = 0
+    
+    For ChangeEval = 2 To Counter
+    
+        'Find Greatest Increase
+        If Cells(ChangeEval, 11) > Increase Then
+            Increase = Cells(ChangeEval, 11)
+            Cells(2, 15) = Cells(ChangeEval, 9) 'Print Ticker
+            Cells(2, 16) = Cells(ChangeEval, 11) ' Print Value
+        End If
+        
+        ' FindGreatest Decrease
+        If Cells(ChangeEval, 11) < Decrease Then
+            Decrease = Cells(ChangeEval, 11)
+            Cells(3, 15) = Cells(ChangeEval, 9) 'Print Ticker
+            Cells(3, 16) = Cells(ChangeEval, 11) ' Print Value
+        End If
+        
+        ' Find Greatest Volume
+        
+        If Cells(ChangeEval, 12) > MaxVolume Then
+            MaxVolume = Cells(ChangeEval, 12)
+            Cells(4, 15) = Cells(ChangeEval, 9) 'Print Ticker
+            Cells(4, 16) = Cells(ChangeEval, 12) ' Print Value
+        End If
+        
+    Next ChangeEval
     
     'Format Table
-    ws.Columns("I:L").EntireColumn.AutoFit
+    ws.Columns("I:P").EntireColumn.AutoFit
     ws.Columns("K:K").NumberFormat = "0.00%"
+    ws.Range("P2").NumberFormat = "0.00%"
+    ws.Range("P3").NumberFormat = "0.00%"
 
 Next
     
